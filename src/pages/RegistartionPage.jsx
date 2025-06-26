@@ -245,7 +245,7 @@ const RegistrationPage = () => {
           <p className="text-gray-600 text-sm">
             Already Have An Account?{" "}
             <a
-              href="#"
+              href="/login"
               className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
             >
               Login

@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 
-export default function ALIApiInterface() {
+export default function AiChat() {
   const [inputValue, setInputValue] = useState("");
   const [isDark, setIsDark] = useState(false);
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const API_BASE_URL = "https://alibackend.duckdns.org";
 
@@ -22,144 +23,59 @@ export default function ALIApiInterface() {
     ]);
 
     try {
-      // Try different common API endpoints with various HTTP methods
+      // Try different common API endpoints
       const endpoints = [
-        // Standard REST endpoints
-        { path: "/api/chat", method: "POST" },
-        { path: "/api/v1/chat", method: "POST" },
-        { path: "/chat", method: "POST" },
-        { path: "/api/message", method: "POST" },
-        { path: "/api/messages", method: "POST" },
-        { path: "/message", method: "POST" },
-        { path: "/messages", method: "POST" },
-        { path: "/api/query", method: "POST" },
-        { path: "/query", method: "POST" },
-        { path: "/api/send", method: "POST" },
-        { path: "/send", method: "POST" },
-        { path: "/api/completion", method: "POST" },
-        { path: "/completion", method: "POST" },
-        { path: "/api/generate", method: "POST" },
-        { path: "/generate", method: "POST" },
-        // Try GET endpoints as well
-        { path: "/api/chat", method: "GET" },
-        { path: "/chat", method: "GET" },
-        { path: "/api/status", method: "GET" },
-        { path: "/status", method: "GET" },
-        { path: "/health", method: "GET" },
-        { path: "/", method: "GET" },
+        "/api/chat",
+        "/chat",
+        "/api/message",
+        "/message",
+        "/api/query",
+        "/query",
       ];
 
       let response = null;
       let responseData = null;
-      let workingEndpoint = null;
-
-      // First, try to check if the server is accessible
-      try {
-        const healthCheck = await fetch(API_BASE_URL, {
-          method: "GET",
-          mode: "cors",
-          timeout: 5000,
-        });
-        console.log("Server accessible:", healthCheck.status);
-      } catch (err) {
-        console.log("Server may not be accessible:", err);
-      }
 
       for (const endpoint of endpoints) {
         try {
-          const requestOptions = {
-            method: endpoint.method,
+          response = await fetch(`${API_BASE_URL}${endpoint}`, {
+            method: "POST",
             headers: {
               "Content-Type": "application/json",
               Accept: "application/json",
-              "Access-Control-Allow-Origin": "*",
             },
-            mode: "cors",
-            timeout: 10000,
-          };
-
-          // Only add body for POST requests
-          if (endpoint.method === "POST") {
-            requestOptions.body = JSON.stringify({
+            body: JSON.stringify({
               message: userMessage,
               query: userMessage,
               text: userMessage,
               input: userMessage,
-              prompt: userMessage,
-              content: userMessage,
-              data: userMessage,
-            });
-          }
-
-          console.log(
-            `Trying ${endpoint.method} ${API_BASE_URL}${endpoint.path}`
-          );
-
-          response = await fetch(
-            `${API_BASE_URL}${endpoint.path}`,
-            requestOptions
-          );
-
-          console.log(`Response status: ${response.status}`);
+            }),
+          });
 
           if (response.ok) {
-            try {
-              responseData = await response.json();
-              workingEndpoint = endpoint;
-              console.log(
-                "Success with endpoint:",
-                endpoint,
-                "Response:",
-                responseData
-              );
-              break;
-            } catch (jsonErr) {
-              // Try to get text response
-              const textResponse = await response.text();
-              if (textResponse) {
-                responseData = { message: textResponse };
-                workingEndpoint = endpoint;
-                break;
-              }
-            }
-          } else if (response.status === 404) {
-            console.log(`404 - Endpoint ${endpoint.path} not found`);
-          } else if (response.status === 405) {
-            console.log(
-              `405 - Method ${endpoint.method} not allowed for ${endpoint.path}`
-            );
-          } else {
-            console.log(`Error ${response.status} for ${endpoint.path}`);
+            responseData = await response.json();
+            break;
           }
         } catch (err) {
-          console.log(
-            `Endpoint ${endpoint.path} (${endpoint.method}) failed:`,
-            err.message
-          );
+          console.log(`Endpoint ${endpoint} failed:`, err);
           continue;
         }
       }
 
-      if (responseData && workingEndpoint) {
+      if (responseData) {
         // Handle different response formats
         let botResponse = "";
-        if (typeof responseData === "string") {
-          botResponse = responseData;
-        } else if (responseData.response) {
+        if (responseData.response) {
           botResponse = responseData.response;
         } else if (responseData.message) {
           botResponse = responseData.message;
         } else if (responseData.result) {
           botResponse = responseData.result;
-        } else if (responseData.content) {
-          botResponse = responseData.content;
         } else if (responseData.data) {
           botResponse =
             typeof responseData.data === "string"
               ? responseData.data
               : JSON.stringify(responseData.data);
-        } else if (responseData.text) {
-          botResponse = responseData.text;
         } else {
           botResponse = JSON.stringify(responseData);
         }
@@ -173,25 +89,7 @@ export default function ALIApiInterface() {
           },
         ]);
       } else {
-        // Provide more specific error information
-        const errorMsg = `Unable to connect to ALI API at ${API_BASE_URL}. 
-
-Possible issues:
-• Server might be down or unreachable
-• CORS (Cross-Origin) restrictions
-• API endpoints may have different paths
-• Authentication might be required
-
-Check the browser console for detailed error logs.`;
-
-        setMessages((prev) => [
-          ...prev,
-          {
-            type: "error",
-            content: errorMsg,
-            timestamp: new Date(),
-          },
-        ]);
+        throw new Error("No valid endpoint found");
       }
     } catch (error) {
       console.error("API Error:", error);
@@ -199,7 +97,8 @@ Check the browser console for detailed error logs.`;
         ...prev,
         {
           type: "error",
-          content: `Connection failed: ${error.message}. Please check if the API server is running and accessible.`,
+          content:
+            "Sorry, I encountered an error while processing your request. The API might be unavailable or the endpoints might have changed.",
           timestamp: new Date(),
         },
       ]);
@@ -219,6 +118,33 @@ Check the browser console for detailed error logs.`;
     setMessages([]);
   };
 
+  const handleLogout = () => {
+    // Clear any stored user data
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userSession");
+    localStorage.removeItem("chatHistory");
+
+    // Clear session storage
+    sessionStorage.clear();
+
+    // Reset component state
+    setMessages([]);
+    setInputValue("");
+    setIsDark(false);
+    setIsLoading(false);
+    setShowLogoutModal(false);
+
+    // Redirect to login page or home page
+    // If using React Router:
+    // navigate('/login');
+
+    // If using plain JavaScript:
+    window.location.href = "/login";
+
+    // Or reload the page to clear everything
+    // window.location.reload();
+  };
+
   const formatTime = (date) => {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
@@ -227,6 +153,47 @@ Check the browser console for detailed error logs.`;
     <div
       className={`min-h-screen flex ${isDark ? "bg-gray-900" : "bg-gray-50"}`}
     >
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div
+            className={`${
+              isDark ? "bg-gray-800" : "bg-white"
+            } rounded-lg p-6 max-w-md w-mx-4`}
+          >
+            <h3
+              className={`text-lg font-semibold mb-4 ${
+                isDark ? "text-white" : "text-gray-900"
+              }`}
+            >
+              Confirm Logout
+            </h3>
+            <p className={`mb-6 ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+              Are you sure you want to logout? Your current chat session will be
+              lost.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className={`px-4 py-2 rounded-md ${
+                  isDark
+                    ? "bg-gray-700 hover:bg-gray-600 text-gray-200"
+                    : "bg-gray-200 hover:bg-gray-300 text-gray-800"
+                } transition-colors`}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Sidebar */}
       <div
         className={`w-60 ${
@@ -337,7 +304,10 @@ Check the browser console for detailed error logs.`;
 
         {/* Logout */}
         <div className="mt-auto p-4">
-          <div className="flex items-center gap-2 text-red-500 cursor-pointer hover:text-red-600 transition-colors">
+          <div
+            className="flex items-center gap-2 text-red-500 cursor-pointer hover:text-red-600 transition-colors"
+            onClick={() => setShowLogoutModal(true)}
+          >
             <span>▶</span>
             <span className="text-sm">Logout</span>
           </div>

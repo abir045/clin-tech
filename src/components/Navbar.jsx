@@ -10,7 +10,7 @@ import {
 
 const Nav = () => {
   return (
-    <div className="">
+    <div className="fixed top-0 left-0 right-0 z-50">
       <Navbar fluid className="bg-[#0f172af2] text-white py-5">
         <NavbarBrand
           as={Link}

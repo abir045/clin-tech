@@ -4,6 +4,7 @@ import Main from "../Layout/Main";
 import Home from "../pages/Home";
 import RegistrationPage from "../pages/RegistartionPage";
 import LoginPage from "../pages/LoginPage";
+import AiChat from "../pages/AiChat";
 
 export const router = createBrowserRouter([
   {
@@ -22,6 +23,10 @@ export const router = createBrowserRouter([
       {
         path: "/login",
         element: <LoginPage />,
+      },
+      {
+        path: "/chat",
+        element: <AiChat />,
       },
     ],
   },
