@@ -1,12 +1,34 @@
-# React + Vite
+# Clin‑Tech
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern healthcare tech demo using React, Tailwind CSS, and Flowbite‑React components to showcase AI‑powered clinical dictation vs. case note comparison.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Features
 
-## Expanding the ESLint configuration
+- **Top-level Tabs**: Switch between different services (TranscriptX, Chartwright, Redactify, Validity).
+- **Example Tabs**: Each service has multiple "Example" scenarios with:
+  - A **preview/overview** section
+  - A **raw dictation** vs. **AI-enhanced case note** comparison
+- **Collapsible UI**: Users can collapse the comparison area to simplify the view.
+- **API Integration**: Optional fetch from backend endpoints for real chat data.
+- **Responsive Design**: Mobile-first styling with Tailwind CSS.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## ⚙️ Tech Stack
+
+- **React** (functional components + hooks)
+- **Tailwind CSS** (utility-first styling)
+- **Flowbite‑React** (tabs & UI components)
+- **Optional**: Fetch API or `axios` for backend integration
+
+---
+
+## 📦 Installation
+
+1. Clone the repo:
+   ```bash
+   git clone https://github.com/abir045/clin-tech.git
+   cd clin-tech
+   ```
