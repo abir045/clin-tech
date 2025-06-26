@@ -32,3 +32,19 @@ A modern healthcare tech demo using React, Tailwind CSS, and Flowbite‑React co
    git clone https://github.com/abir045/clin-tech.git
    cd clin-tech
    ```
+
+## Install dependencies:
+
+`npm install`
+
+# or
+
+`yarn install`
+
+## Run the development server:
+
+`npm run dev`
+
+# or
+
+`yarn dev`
